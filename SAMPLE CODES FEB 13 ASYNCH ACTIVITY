@@ -1,22 +1,32 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Mar 14 23:11:58 2026
+Created on Sat Mar 14 23:50:38 2026
 
-@author: Jhon lowell Daculan gumana
+@author: Jhon lowell Daculan
 """
 
+# Unsupervised Clustering of Movies Dataset
+
+# Import necessary libraries
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
 
 # Load dataset
-df = pd.read_csv(r"C:\Users\Jhon lowell Daculan\Downloads\DACULAN_SAMPLE_SUPERVISED_K-Pop_Song_Popularity_Dataset_with_Titles.csv")
+df = pd.read_csv(r"C:\Users\Jhon lowell Daculan\Downloads\DACULAN_SAMPLE_UNSUPERVISED_Movies_Dataset.csv")
 
-# Drop rows with missing values (your file has empty rows at the bottom)
+# Drop rows with missing values
 df = df.dropna()
 
 # Select numeric features for clustering (exclude non-numeric columns)
-X = df.drop(columns=["song_title", "artist"])
+X = df[['Year',
+        'Duration_Minutes',
+        'IMDb_Rating',
+        'Votes_Thousands',
+        'Budget_Million_USD',
+        'BoxOffice_Million_USD']]
 
 # Scale features for better clustering performance
 scaler = StandardScaler()
@@ -26,13 +36,29 @@ X_scaled = scaler.fit_transform(X)
 kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
 df["Cluster"] = kmeans.fit_predict(X_scaled)
 
-# Show results with actual song titles and artists
-results = df[["song_title", "artist", "Cluster", "popularity_score"]]
+# Show results with movie titles
+results = df[["Title", "Director", "Cluster", "IMDb_Rating", "BoxOffice_Million_USD"]]
 
 # Print the full table
 print("\nClustering Results (all rows):")
 print(results.to_string(index=False))
 
-# Optional: Save to CSV for easier viewing
+# Save to CSV
 results.to_csv("clustering_output.csv", index=False)
 print("\nTable saved as 'clustering_output.csv'")
+
+# -----------------------------
+# Plot the clusters using PCA
+# -----------------------------
+
+# Reduce dimensions to 2 for visualization
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+
+# Scatter plot of clusters
+plt.figure(figsize=(8,6))
+plt.scatter(X_pca[:,0], X_pca[:,1], c=df["Cluster"])
+plt.xlabel("Principal Component 1")
+plt.ylabel("Principal Component 2")
+plt.title("Movie Clusters Visualization")
+plt.show()
