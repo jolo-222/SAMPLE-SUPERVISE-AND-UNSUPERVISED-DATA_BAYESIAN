@@ -1,0 +1,38 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Mar 14 23:11:58 2026
+
+@author: Jhon lowell Daculan gumana
+"""
+
+import pandas as pd
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+# Load dataset
+df = pd.read_csv(r"C:\Users\Jhon lowell Daculan\Downloads\DACULAN_SAMPLE_SUPERVISED_K-Pop_Song_Popularity_Dataset_with_Titles.csv")
+
+# Drop rows with missing values (your file has empty rows at the bottom)
+df = df.dropna()
+
+# Select numeric features for clustering (exclude non-numeric columns)
+X = df.drop(columns=["song_title", "artist"])
+
+# Scale features for better clustering performance
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Apply KMeans clustering
+kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
+df["Cluster"] = kmeans.fit_predict(X_scaled)
+
+# Show results with actual song titles and artists
+results = df[["song_title", "artist", "Cluster", "popularity_score"]]
+
+# Print the full table
+print("\nClustering Results (all rows):")
+print(results.to_string(index=False))
+
+# Optional: Save to CSV for easier viewing
+results.to_csv("clustering_output.csv", index=False)
+print("\nTable saved as 'clustering_output.csv'")
