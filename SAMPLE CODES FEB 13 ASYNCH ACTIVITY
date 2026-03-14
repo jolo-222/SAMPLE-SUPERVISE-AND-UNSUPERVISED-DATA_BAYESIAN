@@ -10,13 +10,18 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 
 # Load dataset
-df = pd.read_csv(r"C:\Users\Jhon lowell Daculan\Downloads\DACULAN_SAMPLE_SUPERVISED_K-Pop_Song_Popularity_Dataset_with_Titles.csv")
+df = pd.read_csv(r"C:\Users\John Philip Nadala\Downloads\NADALA_SAMPLE_UNSUPERVISED_movies_dataset_200.csv")
 
-# Drop rows with missing values (your file has empty rows at the bottom)
+# Drop rows with missing values
 df = df.dropna()
 
 # Select numeric features for clustering (exclude non-numeric columns)
-X = df.drop(columns=["song_title", "artist"])
+X = df[['Year',
+        'Duration_Minutes',
+        'IMDb_Rating',
+        'Votes_Thousands',
+        'Budget_Million_USD',
+        'BoxOffice_Million_USD']]
 
 # Scale features for better clustering performance
 scaler = StandardScaler()
@@ -26,8 +31,8 @@ X_scaled = scaler.fit_transform(X)
 kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
 df["Cluster"] = kmeans.fit_predict(X_scaled)
 
-# Show results with actual song titles and artists
-results = df[["song_title", "artist", "Cluster", "popularity_score"]]
+# Show results with movie titles
+results = df[["Title", "Director", "Cluster", "IMDb_Rating", "BoxOffice_Million_USD"]]
 
 # Print the full table
 print("\nClustering Results (all rows):")
